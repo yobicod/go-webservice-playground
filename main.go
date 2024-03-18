@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -49,9 +50,22 @@ func getBookById(c *gin.Context) {
 	c.JSON(http.StatusNotFound, "Data not found")
 }
 
+func addBook(c *gin.Context) {
+	var newBook book
+
+	if err := c.BindJSON(&newBook); err != nil {
+		return
+	}
+
+	books = append(books, newBook)
+	fmt.Println(books)
+	c.JSON(http.StatusCreated, newBook)
+}
+
 func main() {
 	router := gin.Default()
 	router.GET("/books", getAllBooks)
 	router.GET("/books/:id", getBookById)
+	router.POST("/books", addBook)
 	router.Run("localhost:8080")
 }
