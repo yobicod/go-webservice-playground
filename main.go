@@ -1,11 +1,14 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
+
+const serverPort = "8000"
 
 type book struct {
 	ID     string  `json:"id"`
@@ -102,12 +105,12 @@ func updateBook(c *gin.Context) {
 func deleteBook(c *gin.Context) {
 	paramId := c.Param("id")
 
-	// for i := 0; i <= len(books)-1; i++ {
-	// 	if books[i].ID == paramId {
-	// 		c.JSON(http.StatusOK, "Delete success")
-	// 		return
-	// 	}
-	// }
+	for i := 0; i <= len(books)-1; i++ {
+		if books[i].ID == paramId {
+			c.JSON(http.StatusOK, "Delete success")
+			return
+		}
+	}
 
 	for _, v := range books {
 		if v.ID == paramId {
@@ -119,6 +122,48 @@ func deleteBook(c *gin.Context) {
 	c.JSON(http.StatusNotFound, "Can't delete data(data not found)")
 }
 
+func getPikachu(c *gin.Context) {
+	resp, err := http.Get("https://pokeapi.co/api/v2/pokemon/pikachu")
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		c.JSON(resp.StatusCode, gin.H{"error": "Failed to get pikachu"})
+	}
+
+	var responseData map[string]interface{}
+	err = json.NewDecoder(resp.Body).Decode(&responseData)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse JSON"})
+	}
+
+	c.JSON(http.StatusOK, responseData)
+}
+
+func getYourPokemon(c *gin.Context) {
+	name := c.Param("name")
+	url := "https://pokeapi.co/api/v2/pokemon/" + name
+
+	resp, err := http.Get(url)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		c.JSON(resp.StatusCode, gin.H{"error": "Failed to get your pokemon"})
+	}
+
+	var responseData map[string]interface{}
+	err = json.NewDecoder(resp.Body).Decode(&responseData)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse JSON"})
+		return
+	}
+
+	c.JSON(http.StatusOK, responseData)
+}
 func main() {
 	router := gin.Default()
 	router.GET("/books", getAllBooks)
@@ -126,5 +171,7 @@ func main() {
 	router.POST("/books", addBook)
 	router.PUT("/book/:id", updateBook)
 	router.DELETE("/book/:id", deleteBook)
-	router.Run("localhost:8080")
+	router.GET("/get-pikachu", getPikachu)
+	router.GET("/get/:name", getYourPokemon)
+	router.Run("localhost:" + serverPort)
 }
