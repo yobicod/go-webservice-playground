@@ -133,7 +133,7 @@ func getPikachu(c *gin.Context) {
 		c.JSON(resp.StatusCode, gin.H{"error": "Failed to get pikachu"})
 	}
 
-	var responseData map[string]interface{}
+	responseData := map[string]interface{}{}
 	err = json.NewDecoder(resp.Body).Decode(&responseData)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse JSON"})
@@ -155,7 +155,7 @@ func getYourPokemon(c *gin.Context) {
 		c.JSON(resp.StatusCode, gin.H{"error": "Failed to get your pokemon"})
 	}
 
-	var responseData map[string]interface{}
+	responseData := map[string]interface{}{}
 	err = json.NewDecoder(resp.Body).Decode(&responseData)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse JSON"})
