@@ -157,6 +157,7 @@ func getYourPokemon(c *gin.Context) {
 
 	responseData := map[string]interface{}{}
 	json.NewDecoder(resp.Body).Decode(&responseData)
+	fmt.Printf("Your pokemon is %s\n", responseData["name"])
 	c.IndentedJSON(http.StatusOK, responseData)
 }
 
