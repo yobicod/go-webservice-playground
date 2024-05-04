@@ -156,14 +156,10 @@ func getYourPokemon(c *gin.Context) {
 	}
 
 	responseData := map[string]interface{}{}
-	err = json.NewDecoder(resp.Body).Decode(&responseData)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse JSON"})
-		return
-	}
-
-	c.JSON(http.StatusOK, responseData)
+	json.NewDecoder(resp.Body).Decode(&responseData)
+	c.IndentedJSON(http.StatusOK, responseData)
 }
+
 func main() {
 	router := gin.Default()
 	router.GET("/books", getAllBooks)
